@@ -1,5 +1,3 @@
-var THROTTLE_INTERVAL = 100;
-
 /**
  * Fallback function
  * @method noop
@@ -14,26 +12,18 @@ var noop = function() {};
  * @returns {Function}
  */
 var throttle = function(fn) {
-  var inThrottle;
-  var lastFunc;
-  var lastRan;
+  var ticking = false;
 
   return function() {
     var args = arguments;
 
-    if (inThrottle) {
-      clearTimeout(lastFunc);
-      lastFunc = setTimeout(function () {
-        if (Date.now() - lastRan >= THROTTLE_INTERVAL) {
-          fn.apply(this, args);
-          lastRan = Date.now();
-        }
-      }, THROTTLE_INTERVAL - (Date.now() - lastRan));
-    } else {
-      fn.apply(this, args);
-      lastRan = Date.now();
-      inThrottle = true;
+    if (ticking) {
+      window.cancelAnimationFrame(ticking);
     }
+
+    ticking = window.requestAnimationFrame(function () {
+      fn.apply(this, args);
+    });
   };
 };
 
